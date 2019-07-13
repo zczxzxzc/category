@@ -1,13 +1,3 @@
-#我的第一个python程序
-'''
-def hello():
-    print("HelloWorld!")
-    print("Welcome to Zhangchen's Python.")
-
-if __name__ == '__main__':
-	hello()
-'''
-
 import requests_html
 import os
 
@@ -31,7 +21,8 @@ class Spider(object):
         
         content = 'url:' + url + '\n' + content[0].text
         fileName = 'D:/cl/' + title + ".txt"
-
+        if os.path.exists('D:/cl') == False:
+            os.mkdir('D:/cl')
         print("正在保存小说文件：" + fileName)
         with open(fileName, "w", encoding="utf-8") as f:
             f.write(content)
