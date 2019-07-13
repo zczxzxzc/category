@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-'''
+
 x_values = np.linspace(0,20,100)   # 创建一个列表
 plt.plot(x_values,np.sin(x_values))       # 对于每个点的sin值绘图
 plt.show()                  # 显示
@@ -19,4 +19,4 @@ plt.ylabel('Squares',fontsize=14)
 #设置y轴标签及其字号
 plt.show()
 #显示图表
-'''
+
