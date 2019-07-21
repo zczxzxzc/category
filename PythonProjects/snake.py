@@ -3,14 +3,17 @@ import random
 import sys
 import pygame
 from pygame.locals import *
+from time import localtime, strftime
+import json
 
 # 1/定义颜色变量
 # 饵食为红色 背景为黑色 贪吃🐍身体为白色
 RED_COLOR = pygame.Color(255, 0, 0)
 BLACK_COLOR = pygame.Color(0, 0, 0)
 WHITE_COLOR = pygame.Color(255, 255, 255)
-TEXT_COLOR = (60, 200, 180)
-TEXT_FONT = 'microsoftyaheimicrosoftyaheiui'
+TEXT_COLOR = (255, 255, 255) #(60, 200, 180)
+TEXT_FONT = 'sourcecodepro'
+RANKING_COLOR = (0, 250, 250)
 
 class GameEnv(object):
     def __init__(self):
@@ -30,7 +33,7 @@ class Snake(object):
         # 初始化🐍的起始坐标和长度(列表长度表示身体长度)
         self.head = [(random.randint(1, 20))*20, (random.randint(1, 29))*20]
         self.body = []
-        for i in range(132):
+        for i in range(32):
             self.body.append([self.head[0]-2*i, self.head[1]])
         # 定义目标方块
         self.gen_target()
@@ -40,6 +43,11 @@ class Snake(object):
         self.change_direction = self.direction
         # 初始化图像信息
         self.init_image()
+        # 初始化排行榜
+        self.rank = []  #[[用户，分数，时间]，...]
+        if os.path.exists(os.path.join('', 'rank.json')):
+            with open(os.path.join('', 'rank.json'), 'r') as f:
+                self.rank = json.load(f)
 
 
     def init_image(self):
@@ -94,7 +102,7 @@ class Snake(object):
                         return
                     elif event.key == K_MINUS  and len(username)<15:
                         username.append("_")
-                    elif event.key <= 127 and len(username)<15:
+                    elif event.key <= 127 and len(username)<10:
                         if event.mod in [KMOD_LSHIFT, KMOD_RSHIFT, KMOD_SHIFT, KMOD_CAPS]:
                             username.append(chr(event.key).upper())
                         else:
@@ -129,8 +137,8 @@ class Snake(object):
         ft3_surf = ft3_font.render( pause_text3, 1, TEXT_COLOR)
         screen.blit(ft1_surf, [screen.get_width() / 2 - ft1_surf.get_width() / 2, 50])
         screen.blit(ft2_surf, [screen.get_width() / 2 - ft2_surf.get_width() / 2, 120])
-        screen.blit(ft3_surf, [screen.get_width() / 2 - ft3_surf.get_width() / 2, 200])
-        # TODO 显示排行榜
+        screen.blit(ft3_surf, [screen.get_width() / 2 - ft3_surf.get_width() / 2, 180])
+        self.format_rankinfo()
         pygame.display.flip()
 
         pygame.time.delay(200)
@@ -155,12 +163,23 @@ class Snake(object):
         ft1_surf = ft1_font.render( final_text1, 1, TEXT_COLOR)
         ft2_font = pygame.font.SysFont(TEXT_FONT, 40)
         ft2_surf = ft2_font.render( final_text2, 1, TEXT_COLOR)
-        ft3_font = pygame.font.SysFont(TEXT_FONT, 40)
+        ft3_font = pygame.font.SysFont(TEXT_FONT, 30)
         ft3_surf = ft3_font.render( final_text3, 1, TEXT_COLOR)
         screen.blit(ft1_surf, [screen.get_width() / 2 - ft1_surf.get_width() / 2, 50])
         screen.blit(ft2_surf, [screen.get_width() / 2 - ft2_surf.get_width() / 2, 120])
-        screen.blit(ft3_surf, [screen.get_width() / 2 - ft3_surf.get_width() / 2, 200])
-        # TODO 计算并显示排行榜
+        screen.blit(ft3_surf, [screen.get_width() / 2 - ft3_surf.get_width() / 2, 180])
+        # 计算排行榜
+        current_try = (self.username, self.score, strftime("%Y-%m-%d %H:%M:%S", localtime()) )
+        self.rank.append(current_try)
+        for record in self.rank:
+            if record[1] < self.score:
+                self.rank.insert(self.rank.index(record), current_try)
+                self.rank.pop()
+                break
+        self.rank = self.rank[0:5]
+        with open(os.path.join('', 'rank.json'), 'w+') as f:
+            json.dump(self.rank, f)
+        self.format_rankinfo()
         pygame.display.flip()
         self.is_gameover = True
         pygame.mixer.music.fadeout(500)
@@ -238,6 +257,8 @@ class Snake(object):
                 if pygame.mixer.music.get_busy()==False:
                     pygame.mixer.music.load(os.path.join('music', 'BGM'+ str(random.randint(1, 2)) +'.mp3'))
                     pygame.mixer.music.play()
+                if pygame.key.get_focused() != True:
+                    self.pause()
                 if i == 10:
                     i = 0
                     for event in pygame.event.get():  # 从队列中获取事件
@@ -279,7 +300,6 @@ class Snake(object):
                             return True
             # 通过fps实现速度变化
             pygame.time.Clock().tick(self.speed)
-
 
     def draw(self):
         screen = self.game_env.play_surface
@@ -324,6 +344,23 @@ class Snake(object):
         screen.blit(self.target_image, [self.targetPosition[0], self.targetPosition[1], 20, 20])
         pygame.display.flip()
 
+    def format_rankinfo(self):
+        screen = self.game_env.play_surface
+        title_text = 'RANKING LIST'
+        title_font = pygame.font.SysFont(TEXT_FONT, 40)
+        title_surf = title_font.render( title_text, 1, RANKING_COLOR)
+        screen.blit(title_surf, [screen.get_width() / 2 - title_surf.get_width() / 2, 240])
+        subtitle_text = '{:<11s}{:<6s}{:^20s}'.format('USER', 'SCORE', 'TIME')
+        subtitle_font = pygame.font.SysFont(TEXT_FONT, 30)
+        subtitle_surf = subtitle_font.render( subtitle_text, 1, RANKING_COLOR)
+        screen.blit(subtitle_surf, [screen.get_width() / 2 - subtitle_surf.get_width() / 2, 300])
+        i = 0
+        for record in self.rank:
+            text = '{:<11s}{:<6d}{:>20s}'.format(record[0], record[1], record[2])
+            font = pygame.font.SysFont(TEXT_FONT, 30)
+            surf = font.render( text, 1, RANKING_COLOR)
+            screen.blit(surf, [screen.get_width() / 2 - surf.get_width() / 2, 340+i*40])
+            i += 1
 
 if __name__ == '__main__':
     snake = Snake()
