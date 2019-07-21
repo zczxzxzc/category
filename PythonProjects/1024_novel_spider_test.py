@@ -4,7 +4,7 @@ import os
 class Spider(object):
     def index_request(self):
         session = requests_html.HTMLSession()
-        r = session.get('https://cl.cfbf.xyz/thread0806.php?fid=20&search=&page=3')
+        r = session.get('https://cl.cfbf.xyz/thread0806.php?fid=20&search=&page=2')
         novel_list = r.html.find('#ajaxtable > tbody:nth-child(2) > tr > td.tal > h3')
         novel_list = novel_list[5:-1]
         for x in novel_list:
