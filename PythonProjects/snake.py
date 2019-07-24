@@ -12,6 +12,9 @@ TEXT_FONT = 'sourcecodepro'
 # 1/定义颜色变量
 TEXT_COLOR = (255, 255, 255)
 RANKING_COLOR = (0, 250, 250)
+IMG = os.path.join(os.path.curdir, 'img')
+MUSIC = os.path.join(os.path.curdir, 'music')
+
 
 class GameEnv(object):
     def __init__(self):
@@ -21,6 +24,7 @@ class GameEnv(object):
         self.play_surface = pygame.display.set_mode((800, 600), flags=SRCALPHA, depth=32)
         pygame.event.set_allowed([KEYDOWN, QUIT])
         pygame.mixer.init()
+
 
 class Snake(object):
     def __init__(self):
@@ -66,21 +70,21 @@ class Snake(object):
                 self.rank = json.load(rankfile)
 
     def init_image(self):
-        self.head_image_right = pygame.image.load(os.path.join('img', 'sneak_head_right.png')).convert_alpha()
-        self.head_image_left = pygame.image.load(os.path.join('img', 'sneak_head_left.png')).convert_alpha()
-        self.head_image_up = pygame.image.load(os.path.join('img', 'sneak_head_up.png')).convert_alpha()
-        self.head_image_down = pygame.image.load(os.path.join('img', 'sneak_head_down.png')).convert_alpha()
+        self.head_image_right = pygame.image.load(os.path.join(IMG, 'sneak_head_right.png')).convert_alpha()
+        self.head_image_left = pygame.image.load(os.path.join(IMG, 'sneak_head_left.png')).convert_alpha()
+        self.head_image_up = pygame.image.load(os.path.join(IMG, 'sneak_head_up.png')).convert_alpha()
+        self.head_image_down = pygame.image.load(os.path.join(IMG, 'sneak_head_down.png')).convert_alpha()
         self.head_image_right.set_alpha(255)
         self.head_image_left.set_alpha(255)
         self.head_image_up.set_alpha(255)
         self.head_image_down.set_alpha(255)
 
-        self.body_image_horizontal = pygame.image.load(os.path.join('img', 'sneak_body_horizontal.png')).convert_alpha()
-        self.body_image_vertical = pygame.image.load(os.path.join('img', 'sneak_body_vertical.png')).convert_alpha()
-        self.body_image_left_down = pygame.image.load(os.path.join('img', 'sneak_body_left_down.png')).convert_alpha()
-        self.body_image_left_up = pygame.image.load(os.path.join('img', 'sneak_body_left_up.png')).convert_alpha()
-        self.body_image_right_down = pygame.image.load(os.path.join('img', 'sneak_body_right_down.png')).convert_alpha()
-        self.body_image_right_up = pygame.image.load(os.path.join('img', 'sneak_body_right_up.png')).convert_alpha()
+        self.body_image_horizontal = pygame.image.load(os.path.join(IMG, 'sneak_body_horizontal.png')).convert_alpha()
+        self.body_image_vertical = pygame.image.load(os.path.join(IMG, 'sneak_body_vertical.png')).convert_alpha()
+        self.body_image_left_down = pygame.image.load(os.path.join(IMG, 'sneak_body_left_down.png')).convert_alpha()
+        self.body_image_left_up = pygame.image.load(os.path.join(IMG, 'sneak_body_left_up.png')).convert_alpha()
+        self.body_image_right_down = pygame.image.load(os.path.join(IMG, 'sneak_body_right_down.png')).convert_alpha()
+        self.body_image_right_up = pygame.image.load(os.path.join(IMG, 'sneak_body_right_up.png')).convert_alpha()
         self.body_image_horizontal.set_alpha(255)
         self.body_image_vertical.set_alpha(255)
         self.body_image_left_down.set_alpha(255)
@@ -88,23 +92,23 @@ class Snake(object):
         self.body_image_right_down.set_alpha(255)
         self.body_image_right_up.set_alpha(255)
 
-        self.tail_image_right = pygame.image.load(os.path.join('img', 'sneak_tail_right.png')).convert_alpha()
-        self.tail_image_left = pygame.image.load(os.path.join('img', 'sneak_tail_left.png')).convert_alpha()
-        self.tail_image_up = pygame.image.load(os.path.join('img', 'sneak_tail_up.png')).convert_alpha()
-        self.tail_image_down = pygame.image.load(os.path.join('img', 'sneak_tail_down.png')).convert_alpha()
-        self.target_image = pygame.image.load(os.path.join('img', 'chicken.png')).convert_alpha()
+        self.tail_image_right = pygame.image.load(os.path.join(IMG, 'sneak_tail_right.png')).convert_alpha()
+        self.tail_image_left = pygame.image.load(os.path.join(IMG, 'sneak_tail_left.png')).convert_alpha()
+        self.tail_image_up = pygame.image.load(os.path.join(IMG, 'sneak_tail_up.png')).convert_alpha()
+        self.tail_image_down = pygame.image.load(os.path.join(IMG, 'sneak_tail_down.png')).convert_alpha()
+        self.target_image = pygame.image.load(os.path.join(IMG, 'chicken.png')).convert_alpha()
         self.tail_image_right.set_alpha(255)
         self.tail_image_left.set_alpha(255)
         self.tail_image_up.set_alpha(255)
         self.tail_image_down.set_alpha(255)
         self.target_image.set_alpha(255)
 
-        self.background_image = pygame.image.load(os.path.join('img', 'background.png')).convert()
+        self.background_image = pygame.image.load(os.path.join(IMG, 'background.png')).convert()
 
     def welcome(self):
         screen = self.game_env.play_surface
         username = []
-        pygame.mixer.music.load(os.path.join('music', 'warmup.mp3'))
+        pygame.mixer.music.load(os.path.join(MUSIC, 'warmup.mp3'))
         pygame.mixer.music.play()
         while True:
             for event in pygame.event.get():  # 从队列中获取事件
@@ -159,7 +163,7 @@ class Snake(object):
         pygame.event.clear()
         while True:
             if not pygame.mixer.music.get_busy():
-                pygame.mixer.music.load(os.path.join('music', 'BGM' + str(random.randint(1, 2)) + '.mp3'))
+                pygame.mixer.music.load(os.path.join(MUSIC, 'BGM' + str(random.randint(1, 2)) + '.mp3'))
                 pygame.mixer.music.play()
             for event in pygame.event.get():  # 从队列中获取事件
                 if event.type == KEYDOWN:
@@ -197,7 +201,7 @@ class Snake(object):
         pygame.display.flip()
         self.is_gameover = True
         pygame.mixer.music.fadeout(500)
-        pygame.mixer.music.queue(os.path.join('music', 'rest.mp3'))
+        pygame.mixer.music.queue(os.path.join(MUSIC, 'rest.mp3'))
         pygame.time.delay(1000)
         pygame.event.clear()
         return
@@ -271,7 +275,7 @@ class Snake(object):
             if not self.is_gameover:
                 # 如果没有音乐流则加载播放BGM
                 if not pygame.mixer.music.get_busy():
-                    pygame.mixer.music.load(os.path.join('music', 'BGM' + str(random.randint(1, 2)) + '.mp3'))
+                    pygame.mixer.music.load(os.path.join(MUSIC, 'BGM' + str(random.randint(1, 2)) + '.mp3'))
                     pygame.mixer.music.play()
                 if not pygame.key.get_focused():
                     self.pause()
@@ -306,7 +310,7 @@ class Snake(object):
             else:
                 # 加载音乐
                 if not pygame.mixer.music.get_busy():
-                    pygame.mixer.music.load(os.path.join('music', 'rest.mp3'))
+                    pygame.mixer.music.load(os.path.join(MUSIC, 'rest.mp3'))
                     pygame.mixer.music.play()
                 for event in pygame.event.get():
                     if event.type == KEYDOWN:
